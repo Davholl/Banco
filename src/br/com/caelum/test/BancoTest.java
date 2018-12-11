@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import br.com.caelum.exceptions.EscroticeException;
 import br.com.caelum.exceptions.OperacaoInvalidaException;
+import br.com.caelum.exceptions.ReceitaIndisponivelException;
 import br.com.caelum.model.Banco;
 import br.com.caelum.model.Cliente;
 import br.com.caelum.model.Conta;
@@ -102,10 +104,21 @@ public class BancoTest {
 		Mockito.when(receita.estaRegular(conta2.getCliente().getCpf())).thenReturn(Boolean.FALSE);
 		Mockito.when(receita.estaRegular(conta3.getCliente().getCpf())).thenReturn(Boolean.TRUE);
 		
-		banco.getClientesComCpfValido();
-		
-		
+		Assert.assertEquals(2, banco.getClientesComCpfValido().size());
 	}
+	
+	@Test(expected=ReceitaIndisponivelException.class)
+	public void deve_jogar_o_receitaIndisponivelException_quando_receber_escroticeException(){
+		
+		Mockito.doThrow(EscroticeException.class).when(receita).estaRegular(conta1.getCliente().getCpf());
+		
+		banco.adicionaConta(conta1);
+		banco.adicionaConta(conta2);
+		banco.adicionaConta(conta3);
+		
+		banco.getClientesComCpfValido();
+	}
+	
 	
 	
 }
