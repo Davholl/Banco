@@ -1,38 +1,44 @@
 package br.com.caelum.model;
 
+import java.math.BigDecimal;
+
 import br.com.caelum.exceptions.OperacaoInvalidaException;
 import br.com.caelum.exceptions.SaldoInsuficienteException;
 
 public class Conta {
-	private double saldo;
+	private int numero;
+	private BigDecimal saldo;
 	private Cliente cliente;
 	
 	public String toString(){
 		return this.cliente.getNome();
 	}
 
-	public Conta (Cliente cliente){
+	public Conta (int numero, Cliente cliente){
+		this.saldo = new BigDecimal(0);
 		this.cliente = cliente;
+		this.setNumero(numero);
 	}
 	
-	public void depositar(double valor){
-		if (valor < 0){
+	public void depositar(BigDecimal valor){
+		if (valor.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Saldo Invalido");
 		}
-		this.saldo += valor;
+		this.saldo = this.saldo.add(valor);
 	}
 	
-	public void sacar(double valor){
-		if (valor > this.saldo){
+	public void sacar(BigDecimal valor){
+		if (this.saldo.compareTo(valor) < 0){
 			throw new SaldoInsuficienteException("Saldo insuficiente");
 		}
-		if (valor <= 0){
+		
+		if (valor.compareTo(new BigDecimal(0)) <= 0 ){
 			throw new OperacaoInvalidaException("Não pode sacar 0 ou negativo");
 		}
-		this.saldo -= valor;
+		this.saldo = this.saldo.subtract(valor);
 	}
 	
-	public void transferir(double valor, Conta conta){
+	public void transferir(BigDecimal valor, Conta conta){
 		if (conta == this){
 			throw new OperacaoInvalidaException("Operacao Invalida: Nao e possivel transferir para a mesma conta");
 		}
@@ -42,17 +48,25 @@ public class Conta {
 	}
 	
 	public boolean isEstilo(){
-		if (this.getSaldo() >= 1000){
+		if (this.getSaldo().compareTo(new BigDecimal(1000)) >= 0){
 			return true;
 		}
 		return false;
 	}
-	public double getSaldo(){
+	public BigDecimal getSaldo(){
 		return saldo;
 	}
 
 	public Cliente getCliente() {
 		return cliente;
+	}
+
+	public int getNumero() {
+		return numero;
+	}
+
+	public void setNumero(int numero) {
+		this.numero = numero;
 	}
 
 }
